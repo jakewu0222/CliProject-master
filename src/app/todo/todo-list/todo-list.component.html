@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="row card-page card-content z-depth-2">
+    <div *ngIf="!todoList">
+      <h3>Loading...</h3>
+    </div>
+    <div *ngIf="todoList">
+      <div class="col s12">
+        <h1>
+          todoList
+        </h1>
+      </div>
+      <div class="col s12 right-align">
+        <button (click)="toAdd()" class="waves-effect waves-light btn-flat text-primary">Add a new Todo</button>
+      </div>
+      <table class="responsive-table highlight">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Title</th>
+            <th>status</th>
+            <th>createTime</th>
+            <th>editedTime</th>
+            <th class="center-align">Edit</th>
+            <th class="center-align">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let todo of todoList | async; let i = index" class="borderless">
+            <td>
+              {{i+1}}
+            </td>
+            <td>
+              {{todo.title}}
+            </td>
+            <td>
+              {{todo.status}}
+            </td>
+            <td>
+              {{todo.createdTime | date}}
+            </td>
+            <td>
+              {{todo.editedTime | date}}
+            </td>
+            <td>
+              <button (click)="toDetail(todo.id)" class="waves-effect waves-light btn-flat text-yellow">EDIT</button>
+            </td>
+            <td>
+              <button (click)="doDelete(todo.id)" class="waves-effect waves-light btn-flat text-red">DELETE</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
