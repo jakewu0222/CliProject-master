@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { TodoService } from '../../service/todo/todo.service';
 import { Router } from '@angular/router';
+
+import { TodoService } from '../../service/todo/todo.service';
+
 @Component({
   selector: 'app-todo-add',
   templateUrl: './todo-add.component.html',
@@ -21,7 +23,6 @@ export class TodoAddComponent implements OnInit {
       editedTime: now
     };
     this._todoService.addTodo(newTodo);
-    this._router.navigateByUrl('/todo/list');
   }
   doBack(): void {
     this._router.navigateByUrl('/todo/list');

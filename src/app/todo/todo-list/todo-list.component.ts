@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { TodoService, Todo } from '../../service/todo/todo.service';
-import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+
+import { Todo, TodoService } from '../../service/todo/todo.service';
+
 @Component({
   selector: 'app-todo-list',
   templateUrl: './todo-list.component.html',

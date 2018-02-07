@@ -1,32 +1,46 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+
 @Injectable()
 export class TodoService {
   private todoStore: BehaviorSubject<Todo[]> = new BehaviorSubject<Todo[]>(
-    new Array<Todo>()
+    Array<Todo>()
   );
   todoList: Observable<Todo[]> = this.todoStore;
   private todoApiUrl = 'http://localhost:3000/todo';
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient, private _router: Router) {}
   getTodoList() {
+    console.log(this.todoStore);
     this._http.get<Todo[]>(this.todoApiUrl).subscribe(res => {
-      console.log(this.todoStore.getValue());
+      console.log('get', res);
       this.todoStore.next(res);
     });
   }
   getTodo(id: number) {
-    this._http
-      .get(`${this.todoApiUrl}?id=${id}`)
-      .subscribe(res => this.todoStore.next(res[0]));
+    const value = this.todoStore.getValue();
+    console.log(value.length);
+    if (value.length === 0) {
+      this._http
+        .get<Todo[]>(`${this.todoApiUrl}?id=${id}`)
+        .subscribe(res => this.todoStore.next(res));
+    } else {
+      this.todoStore.next(this.todoStore.value.filter(val => val.id === id));
+    }
+    console.log(this.todoStore, this.todoStore.getValue());
   }
   addTodo(newTodo: NewTodo) {
-    this._http.post(this.todoApiUrl, newTodo).subscribe(res => {
-      console.log(this.todoStore.getValue());
-      this.todoStore.next([...this.todoStore.getValue(), res as Todo]);
-    });
+    this._http.post(this.todoApiUrl, newTodo).subscribe(
+      res => {
+        console.log('add', res);
+      },
+      err => console.log(err),
+      () => {
+        this._router.navigateByUrl('todo/list');
+      }
+    );
   }
   updateTodo(id: number, description: string) {
     const editedTime = new Date();
@@ -35,11 +49,27 @@ export class TodoService {
         description: description,
         editedTime: editedTime
       })
-      .subscribe(res => this.todoStore.next([...this.todoStore.getValue()]));
+      .subscribe(
+        res => {
+          console.log('update', res);
+        },
+        err => console.log(err),
+        () => {
+          this._router.navigateByUrl('todo/list');
+        }
+      );
   }
   deleteTodo(id: number) {
     const editedTime = new Date();
-    this._http.delete(`${this.todoApiUrl}/${id}`).subscribe();
+    this._http.delete(`${this.todoApiUrl}/${id}`).subscribe(
+      res => {
+        console.log('delete', res);
+      },
+      err => console.log(err),
+      () => {
+        this.getTodoList();
+      }
+    );
   }
 }
 export class NewTodo {

@@ -1,15 +1,9 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ElementRef,
-  ViewChild,
-  AfterViewInit
-} from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { filter } from 'rxjs/operators';
-import { TodoService, Todo } from '../../service/todo/todo.service';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+
+import { Todo, TodoService } from '../../service/todo/todo.service';
+
 @Component({
   selector: 'app-todo-detail',
   templateUrl: './todo-detail.component.html',
@@ -34,9 +28,9 @@ export class TodoDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     );
     this._todoService.getTodo(this.id);
     this.todo.forEach(value => {
-      if (value['id'] === this.id) {
-        this.title = value['title'];
-        this.description = value['description'];
+      if (value.length !== 0 && value[0]['id'] === this.id) {
+        this.title = value[0]['title'];
+        this.description = value[0]['description'];
       }
     });
   }
@@ -46,7 +40,6 @@ export class TodoDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   doEdit() {
     const editedTime = new Date();
     this._todoService.updateTodo(this.id, this.description);
-    this._router.navigateByUrl('/todo/list');
   }
   doBack() {
     this._router.navigateByUrl('/todo/list');
