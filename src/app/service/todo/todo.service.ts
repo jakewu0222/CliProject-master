@@ -10,14 +10,12 @@ export class TodoService {
   );
   todoList: Observable<Todo[]> = this.todoStore;
   private todoApiUrl = 'http://localhost:3000/todo';
-  constructor(private _http: HttpClient) {
-    this.getTodoList();
-  }
+  constructor(private _http: HttpClient) {}
   getTodoList() {
-    this._http
-      .get<Todo[]>(this.todoApiUrl)
-      .subscribe(res => this.todoStore.next(res));
-    console.log('getTodoList', this.todoList);
+    this._http.get<Todo[]>(this.todoApiUrl).subscribe(res => {
+      console.log(this.todoStore.getValue());
+      this.todoStore.next(res);
+    });
   }
   getTodo(id: number) {
     this._http
@@ -26,6 +24,7 @@ export class TodoService {
   }
   addTodo(newTodo: NewTodo) {
     this._http.post(this.todoApiUrl, newTodo).subscribe(res => {
+      console.log(this.todoStore.getValue());
       this.todoStore.next([...this.todoStore.getValue(), res as Todo]);
     });
   }
@@ -36,13 +35,11 @@ export class TodoService {
         description: description,
         editedTime: editedTime
       })
-      .subscribe(res => this.getTodoList());
+      .subscribe(res => this.todoStore.next([...this.todoStore.getValue()]));
   }
   deleteTodo(id: number) {
     const editedTime = new Date();
-    this._http
-      .delete(`${this.todoApiUrl}/${id}`)
-      .subscribe(res => this.getTodoList());
+    this._http.delete(`${this.todoApiUrl}/${id}`).subscribe();
   }
 }
 export class NewTodo {
