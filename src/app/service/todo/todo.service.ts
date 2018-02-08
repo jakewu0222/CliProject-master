@@ -13,15 +13,12 @@ export class TodoService {
   private todoApiUrl = 'http://localhost:3000/todo';
   constructor(private _http: HttpClient, private _router: Router) {}
   getTodoList() {
-    console.log(this.todoStore);
     this._http.get<Todo[]>(this.todoApiUrl).subscribe(res => {
-      console.log('get', res);
       this.todoStore.next(res);
     });
   }
   getTodo(id: number) {
     const value = this.todoStore.getValue();
-    console.log(value.length);
     if (value.length === 0) {
       this._http
         .get<Todo[]>(`${this.todoApiUrl}?id=${id}`)
@@ -29,13 +26,10 @@ export class TodoService {
     } else {
       this.todoStore.next(this.todoStore.value.filter(val => val.id === id));
     }
-    console.log(this.todoStore, this.todoStore.getValue());
   }
   addTodo(newTodo: NewTodo) {
     this._http.post(this.todoApiUrl, newTodo).subscribe(
-      res => {
-        console.log('add', res);
-      },
+      res => {},
       err => console.log(err),
       () => {
         this._router.navigateByUrl('todo/list');
@@ -50,9 +44,7 @@ export class TodoService {
         editedTime: editedTime
       })
       .subscribe(
-        res => {
-          console.log('update', res);
-        },
+        res => {},
         err => console.log(err),
         () => {
           this._router.navigateByUrl('todo/list');
@@ -62,9 +54,7 @@ export class TodoService {
   deleteTodo(id: number) {
     const editedTime = new Date();
     this._http.delete(`${this.todoApiUrl}/${id}`).subscribe(
-      res => {
-        console.log('delete', res);
-      },
+      res => {},
       err => console.log(err),
       () => {
         this.getTodoList();
