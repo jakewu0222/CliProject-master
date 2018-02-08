@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 
 import { Todo, TodoService } from '../../service/todo/todo.service';
 
@@ -10,11 +9,14 @@ import { Todo, TodoService } from '../../service/todo/todo.service';
   styleUrls: ['./todo-list.component.scss']
 })
 export class TodoListComponent implements OnInit {
-  todoList: Observable<Todo[]> = this._todoService.todoList;
+  todoList: Todo[];
+  todoListSub$ = this._todoService.todoList$.subscribe(
+    res => (this.todoList = res)
+  );
   constructor(private _router: Router, private _todoService: TodoService) {}
 
   ngOnInit() {
-    this._todoService.getTodoList();
+    this._todoService.getTodoList(true);
   }
   toAdd(): void {
     this._router.navigateByUrl('todo/add');

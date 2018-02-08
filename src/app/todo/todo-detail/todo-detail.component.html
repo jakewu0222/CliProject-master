@@ -1,24 +1,26 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div class="container">
-  <div class="row card-content z-depth-2">
-    <div class="col s12">
-      <h1>
-        {{title}}
-      </h1>
-    </div>
-    <div class="col s12">
-      <blockquote>{{description}}</blockquote>
-    </div>
-    <div class="col s12">
-      <div class="row">
-        <div class="input-field col s6">
-          <textarea required [(ngModel)]="description" #inputDescription id="name" type="text" class="validate materialize-textarea"></textarea>
+<!-- use *ngIf to avoid undefined 'cause by async function -->
+<div class="container" *ngIf='todo'>
+    <div class="row card-content z-depth-2">
+        <div class="col s12">
+            <h3>
+                Title
+                <blockquote>{{todo.title}}</blockquote>
+            </h3>
         </div>
-        <div class="col s12 text-ceter">
-          <button (click)="doEdit()" class="waves-effect waves-light btn-flat text-primary">DONE</button>
-          <button (click)="doBack()" class="waves-effect waves-light btn-flat text-grey">BACK</button>
+        <div class="col s12">
+            <h5>description</h5>
+            <blockquote>{{todo.description}}</blockquote>
         </div>
-      </div>
+        <div class="col s12">
+            <div class="row">
+                <div class="input-field col s6">
+                    <textarea required [(ngModel)]="todo.description" #inputDescription id="name" type="text" class="validate materialize-textarea"></textarea>
+                </div>
+                <div class="col s12 text-ceter">
+                    <button (click)="doEdit()" class="waves-effect waves-light btn-flat text-primary">DONE</button>
+                    <button (click)="doBack()" class="waves-effect waves-light btn-flat text-grey">BACK</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

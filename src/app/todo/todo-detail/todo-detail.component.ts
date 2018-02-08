@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 
 import { Todo, TodoService } from '../../service/todo/todo.service';
 
@@ -9,13 +8,12 @@ import { Todo, TodoService } from '../../service/todo/todo.service';
   templateUrl: './todo-detail.component.html',
   styleUrls: ['./todo-detail.component.scss']
 })
-export class TodoDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+export class TodoDetailComponent implements OnInit, OnChanges, OnDestroy {
   id: number;
-  todo: Observable<Todo[]> = this._todoService.todoList;
-  title = '';
-  description = '';
+  todo: Todo;
+  todoSub$: any;
   @ViewChild('inputDescription') private elementRef: ElementRef;
-  idSub: any;
+  idSub$: any;
   constructor(
     private _router: Router,
     private _activatedRouter: ActivatedRoute,
@@ -23,28 +21,29 @@ export class TodoDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.idSub = this._activatedRouter.params.subscribe(
+    // get id by url
+    this.idSub$ = this._activatedRouter.params.subscribe(
       params => (this.id = +params['id'])
     );
-    this._todoService.getTodo(this.id);
-    this.todo.forEach(value => {
-      if (value.length !== 0 && value[0]['id'] === this.id) {
-        this.title = value[0]['title'];
-        this.description = value[0]['description'];
-      }
-    });
+    this._todoService.todoList$.subscribe(
+      res => (this.todo = this._todoService.getTodo(this.id))
+    );
   }
-  ngAfterViewInit() {
-    this.elementRef.nativeElement.focus();
+  // cause using *ngIf in html so need focus when onChanges instead of ViewInited
+  ngOnChanges() {
+    if (this.todo) {
+      this.elementRef.nativeElement.focus();
+    }
   }
   doEdit() {
-    const editedTime = new Date();
-    this._todoService.updateTodo(this.id, this.description);
+    this.todo.editedTime = new Date();
+    this._todoService.updateTodo(this.todo);
   }
   doBack() {
     this._router.navigateByUrl('/todo/list');
   }
+  // avoid memory leak
   ngOnDestroy() {
-    this.idSub.unsubscribe();
+    this.idSub$.unsubscribe();
   }
 }

@@ -6,58 +6,64 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class TodoService {
-  private todoStore: BehaviorSubject<Todo[]> = new BehaviorSubject<Todo[]>(
+  private todoStore$: BehaviorSubject<Todo[]> = new BehaviorSubject<Todo[]>(
     Array<Todo>()
   );
-  todoList: Observable<Todo[]> = this.todoStore;
+  // public variable let component can subscribe
+  todoList$: Observable<Todo[]> = this.todoStore$;
   private todoApiUrl = 'http://localhost:3000/todo';
+
   constructor(private _http: HttpClient, private _router: Router) {}
-  getTodoList() {
-    this._http.get<Todo[]>(this.todoApiUrl).subscribe(res => {
-      this.todoStore.next(res);
-    });
-  }
-  getTodo(id: number) {
-    const value = this.todoStore.getValue();
-    if (value.length === 0) {
-      this._http
-        .get<Todo[]>(`${this.todoApiUrl}?id=${id}`)
-        .subscribe(res => this.todoStore.next(res));
-    } else {
-      this.todoStore.next(this.todoStore.value.filter(val => val.id === id));
+  // get todoList from api and update todoStore$ by using next()
+  getTodoList(forceRefresh?: boolean) {
+    // if todoStore is empty or need to refresh then get from api
+    if (this.todoStore$.value.length === 0 || forceRefresh) {
+      this._http.get<Todo[]>(this.todoApiUrl).subscribe(res => {
+        this.todoStore$.next(res);
+      });
     }
+  }
+  // using find to get specific object
+  getTodo(id: number) {
+    if (this.todoStore$.value.length === 0) {
+      this.getTodoList();
+    }
+    return this.todoStore$.value.find(todo => todo.id === id);
   }
   addTodo(newTodo: NewTodo) {
     this._http.post(this.todoApiUrl, newTodo).subscribe(
       res => {},
       err => console.log(err),
       () => {
+        // when post completed navigate to list component
         this._router.navigateByUrl('todo/list');
       }
     );
   }
-  updateTodo(id: number, description: string) {
-    const editedTime = new Date();
+  updateTodo(editTodo: Todo) {
     this._http
-      .patch(`${this.todoApiUrl}/${id}`, {
-        description: description,
-        editedTime: editedTime
+      .patch(`${this.todoApiUrl}/${editTodo.id}`, {
+        description: editTodo.description,
+        editedTime: editTodo.editedTime
       })
       .subscribe(
         res => {},
         err => console.log(err),
         () => {
+          // when patch completed navigate to list component
           this._router.navigateByUrl('todo/list');
         }
       );
   }
+  // delete doesn't navigate to any component so it won't trigged ngOninit()
   deleteTodo(id: number) {
     const editedTime = new Date();
     this._http.delete(`${this.todoApiUrl}/${id}`).subscribe(
       res => {},
       err => console.log(err),
       () => {
-        this.getTodoList();
+        //  force getTodoList to update todoStore$
+        this.getTodoList(true);
       }
     );
   }
