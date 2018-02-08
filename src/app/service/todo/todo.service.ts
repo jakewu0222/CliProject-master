@@ -10,7 +10,7 @@ export class TodoService {
     Array<Todo>()
   );
   // public variable let component can subscribe
-  todoList$: Observable<Todo[]> = this.todoStore$;
+  todoList$: Observable<Todo[]> = this.todoStore$.asObservable();
   private todoApiUrl = 'http://localhost:3000/todo';
 
   constructor(private _http: HttpClient, private _router: Router) {}

@@ -1,10 +1,10 @@
 <!-- use *ngIf to avoid undefined 'cause by async function -->
 <div class="container">
     <div class="row card-page card-content z-depth-2">
-        <div *ngIf="!todoList">
+        <div *ngIf="!todoListSub$">
             <h3>Loading...</h3>
         </div>
-        <div *ngIf="todoList">
+        <div *ngIf="todoListSub$">
             <div class="col s12">
                 <h1>
                     todoList
@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let todo of todoList; let i = index" class="borderless">
+                    <tr *ngFor="let todo of todoListSub$ | async; let i = index" class="borderless">
                         <td>
                             {{i+1}}
                         </td>
